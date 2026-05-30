@@ -1,6 +1,24 @@
 # dormlst
 
-`dormlst` is a Go CLI tool for managing student dormitory resident lists without the headaches of Excel. It uses a Git-friendly CSV as the source of truth to ensure data integrity and easy synchronization, generating .xlsx files only when needed for uploads (e.g., to workitout.at).
+`dormlst` is a Go CLI tool for managing student dormitory resident lists without the headaches of Excel. It uses a Git-friendly CSV as the source of truth to ensure data integrity and easy synchronization, generating .xlsx files only when needed.
+
+## Installation
+
+If you have `go` installed simply run:
+
+```bash
+go install github.com/wassr/dormlst@latest
+```
+
+Else download the prebuild binary from the releasse page [here](https://github.com/wassr/dormlst/releases).
+
+Or build it from source yourself.
+
+```bash
+git clone https://github.com/wassr/dormlst.git
+cd dormlst
+go install .
+```
 
 ## Why not just use Excel?
 
@@ -15,7 +33,6 @@ Excel is notoriously bad for version control, often corrupts formatting (like ph
 - **Interactive Management**: Built-in prompts for adding and updating residents with real-time validation.
 - **Strict Validation**: E.164 phone number normalization and verified email formats.
 - **Excel Generation**: Custom YAML mapping to match the exact format required by external vendors.
-- **System Audit**: Quick status command to check database health and statistics.
 
 ## Quick Start
 
@@ -30,7 +47,7 @@ Excel is notoriously bad for version control, often corrupts formatting (like ph
 3. **Search & Show**: Find residents and view detailed profiles.
    ```bash
    dormlst search "Noel"
-   dormlst show 104
+   dormlst show 666
    ```
 4. **Generate Upload File**: Produce the .xlsx for external use.
    ```bash
