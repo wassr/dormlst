@@ -26,7 +26,7 @@ import (
 
 func TestSaveAndLoad(t *testing.T) {
 	tmpFile := "test_residents.csv"
-	defer os.Remove(tmpFile)
+	defer func() { _ = os.Remove(tmpFile) }()
 
 	validDate := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
 	residents := []model.Resident{
@@ -93,8 +93,10 @@ func TestLoad_NonExistentFile(t *testing.T) {
 
 func TestLoad_EmptyFile(t *testing.T) {
 	tmpFile := "empty_test.csv"
-	os.WriteFile(tmpFile, []byte(""), 0644)
-	defer os.Remove(tmpFile)
+	if err := os.WriteFile(tmpFile, []byte(""), 0644); err != nil {
+		t.Fatalf("Failed to write empty file: %v", err)
+	}
+	defer func() { _ = os.Remove(tmpFile) }()
 
 	loaded, err := Load(tmpFile)
 	if err != nil {
@@ -109,8 +111,10 @@ func TestLoad_CorruptFile(t *testing.T) {
 	tmpFile := "corrupt_test.csv"
 	// Write a file with a header but a corrupted row (too few columns)
 	corruptData := "first_name,last_name,room_number,phone_number,email,birthday,date_signed_up,date_added,date_modified,active\nMax,Mustermann"
-	os.WriteFile(tmpFile, []byte(corruptData), 0644)
-	defer os.Remove(tmpFile)
+	if err := os.WriteFile(tmpFile, []byte(corruptData), 0644); err != nil {
+		t.Fatalf("Failed to write corrupt file: %v", err)
+	}
+	defer func() { _ = os.Remove(tmpFile) }()
 
 	_, err := Load(tmpFile)
 	if err == nil {

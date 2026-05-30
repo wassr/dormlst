@@ -46,7 +46,9 @@ func Generate(residents []model.Resident, cfg config.OutputConfig) error {
 	f.SetActiveSheet(index)
 
 	if sheetName != "Sheet1" {
-		f.DeleteSheet("Sheet1")
+		if err := f.DeleteSheet("Sheet1"); err != nil {
+			return err
+		}
 	}
 
 	// Write Header
@@ -55,7 +57,9 @@ func Generate(residents []model.Resident, cfg config.OutputConfig) error {
 		if err != nil {
 			return err
 		}
-		f.SetCellValue(sheetName, cell, col.Target)
+		if err := f.SetCellValue(sheetName, cell, col.Target); err != nil {
+			return err
+		}
 	}
 
 	// Write Data
@@ -71,7 +75,9 @@ func Generate(residents []model.Resident, cfg config.OutputConfig) error {
 				return err
 			}
 			val := getFieldValue(res, col.Source, dateFormat)
-			f.SetCellValue(sheetName, cell, val)
+			if err := f.SetCellValue(sheetName, cell, val); err != nil {
+				return err
+			}
 		}
 	}
 

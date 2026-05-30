@@ -82,19 +82,45 @@ var statusCmd = &cobra.Command{
 
 		// 4. Output Stats
 		w := tabwriter.NewWriter(os.Stdout, 4, 0, 2, ' ', 0)
-		fmt.Fprintf(w, "  RESIDENTS\t\n")
-		fmt.Fprintf(w, "  Total\t%d\n", total)
-		fmt.Fprintf(w, "  Active\t%d\n", active)
-		fmt.Fprintf(w, "  Inactive\t%d\n", inactive)
-		fmt.Fprintf(w, "  Avg. Age\t%.1f\n", avgAge)
-		fmt.Fprintf(w, "\t\n")
-		fmt.Fprintf(w, "  INFRASTRUCTURE\t\n")
-		fmt.Fprintf(w, "  Unique Rooms\t%d\n", len(uniqueRooms))
-		fmt.Fprintf(w, "\t\n")
-		fmt.Fprintf(w, "  HEALTH\t\n")
-		fmt.Fprintf(w, "  Valid Entries\t%d/%d\n", total-len(invalidMsgs), total)
-		fmt.Fprintf(w, "  Recent Changes (7d)\t%d\n", recentMods)
-		w.Flush()
+		if _, err := fmt.Fprintf(w, "  RESIDENTS\t\n"); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "  Total\t%d\n", total); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "  Active\t%d\n", active); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "  Inactive\t%d\n", inactive); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "  Avg. Age\t%.1f\n", avgAge); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "\t\n"); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "  INFRASTRUCTURE\t\n"); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "  Unique Rooms\t%d\n", len(uniqueRooms)); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "\t\n"); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "  HEALTH\t\n"); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "  Valid Entries\t%d/%d\n", total-len(invalidMsgs), total); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "  Recent Changes (7d)\t%d\n", recentMods); err != nil {
+			return err
+		}
+		if err := w.Flush(); err != nil {
+			return err
+		}
 
 		// 5. Report Invalid Entries
 		if len(invalidMsgs) > 0 {

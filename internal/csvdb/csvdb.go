@@ -39,7 +39,7 @@ func Load(path string) ([]model.Resident, error) {
 		}
 		return nil, err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	reader := csv.NewReader(file)
 	// Read header
@@ -85,7 +85,7 @@ func Save(path string, residents []model.Resident) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
