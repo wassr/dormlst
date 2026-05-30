@@ -24,9 +24,10 @@ import (
 	"github.com/wassr/dormlst/internal/excel"
 )
 
-var convertCmd = &cobra.Command{
-	Use:   "convert",
-	Short: "Transform the CSV file into a Microsoft Excel (.xlsx) format",
+var generateCmd = &cobra.Command{
+	Use:   "generate",
+	Short: "Generate the .xlsx file required for uploads",
+	Long:  `Reads the CSV database and produces an Excel file based on the YAML configuration. This is intended to be used as a compatibility artifact for external systems.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		residents, err := csvdb.Load(cfg.Database.Path)
 		if err != nil {
@@ -34,18 +35,18 @@ var convertCmd = &cobra.Command{
 		}
 
 		if len(residents) == 0 {
-			fmt.Println("No residents found in database. Excel file will be empty.")
+			fmt.Println("No residents found in database. Output file will be empty.")
 		}
 
 		if err := excel.Generate(residents, cfg.Output); err != nil {
-			return fmt.Errorf("failed to generate excel file: %w", err)
+			return fmt.Errorf("failed to generate output file: %w", err)
 		}
 
-		fmt.Printf("Successfully converted %s to %s\n", cfg.Database.Path, cfg.Output.Path)
+		fmt.Printf("Successfully generated %s from %s\n", cfg.Output.Path, cfg.Database.Path)
 		return nil
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(convertCmd)
+	rootCmd.AddCommand(generateCmd)
 }

@@ -56,6 +56,27 @@ func TestE2ECLI(t *testing.T) {
 		return out.String(), stderr.String(), err
 	}
 
+	// Step 0: Version and License
+	t.Run("version", func(t *testing.T) {
+		out, _, err := runCmd("--version")
+		if err != nil {
+			t.Fatalf("version failed: %v", err)
+		}
+		if !strings.Contains(out, "1.0.0") {
+			t.Errorf("Version output missing expected version: %s", out)
+		}
+	})
+
+	t.Run("license", func(t *testing.T) {
+		out, _, err := runCmd("license")
+		if err != nil {
+			t.Fatalf("license failed: %v", err)
+		}
+		if !strings.Contains(out, "Apache License, Version 2.0") {
+			t.Errorf("License output missing expected content: %s", out)
+		}
+	})
+
 	// Step 1: Initialize
 	t.Run("init", func(t *testing.T) {
 		out, _, err := runCmd("init")
@@ -149,14 +170,14 @@ func TestE2ECLI(t *testing.T) {
 		}
 	})
 
-	// Step 8: Convert to Excel
-	t.Run("convert", func(t *testing.T) {
-		out, _, err := runCmd("convert")
+	// Step 8: Generate Excel
+	t.Run("generate", func(t *testing.T) {
+		out, _, err := runCmd("generate")
 		if err != nil {
-			t.Fatalf("convert failed: %v", err)
+			t.Fatalf("generate failed: %v", err)
 		}
-		if !strings.Contains(out, "Successfully converted") {
-			t.Errorf("Unexpected convert output: %s", out)
+		if !strings.Contains(out, "Successfully generated") {
+			t.Errorf("Unexpected generate output: %s", out)
 		}
 		if _, err := os.Stat(xlsxPath); os.IsNotExist(err) {
 			t.Fatal("Excel file was not created")
