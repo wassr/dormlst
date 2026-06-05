@@ -34,8 +34,9 @@ var (
 )
 
 var searchCmd = &cobra.Command{
-	Use:   "search [query]",
-	Short: "Find residents based on specific criteria",
+	Use:     "search [query]",
+	Aliases: []string{"se"},
+	Short:   "Find residents based on specific criteria",
 	Long:  `Displays a tabular list of residents matching the query in name, room, or email. If no query is provided, all residents are shown.`,
 	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {

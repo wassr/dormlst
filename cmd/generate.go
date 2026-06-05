@@ -26,8 +26,9 @@ import (
 )
 
 var generateCmd = &cobra.Command{
-	Use:   "generate",
-	Short: "Generate the .xlsx file required for uploads",
+	Use:     "generate",
+	Aliases: []string{"gen"},
+	Short:   "Generate the .xlsx file required for uploads",
 	Long:  `Reads the CSV database and produces an Excel file based on the YAML configuration. This is intended to be used as a compatibility artifact for external systems.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		residents, err := csvdb.Load(cfg.Database.Path)

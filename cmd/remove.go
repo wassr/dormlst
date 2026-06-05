@@ -32,8 +32,9 @@ var (
 )
 
 var removeCmd = &cobra.Command{
-	Use:   "remove [query]",
-	Short: "Delete a resident from the CSV list",
+	Use:     "remove [query]",
+	Aliases: []string{"rm"},
+	Short:   "Delete a resident from the CSV list",
 	Long:  `Search for a resident by name, room number, or email. If multiple matches are found, you will be prompted to select one for removal.`,
 	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {

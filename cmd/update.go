@@ -36,8 +36,9 @@ var (
 )
 
 var updateCmd = &cobra.Command{
-	Use:   "update [query]",
-	Short: "Modify an existing resident's information",
+	Use:     "update [query]",
+	Aliases: []string{"up"},
+	Short:   "Modify an existing resident's information",
 	Long:  `Search for a resident by name, room number, or email. If multiple matches are found, you will be prompted to select one.`,
 	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {

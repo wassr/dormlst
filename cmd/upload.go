@@ -23,8 +23,9 @@ import (
 )
 
 var uploadCmd = &cobra.Command{
-	Use:   "upload",
-	Short: "Upload the resident list (Stubbed)",
+	Use:     "upload",
+	Aliases: []string{"push"},
+	Short:   "Upload the resident list (Stubbed)",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Upload functionality is not implemented yet.")
 	},

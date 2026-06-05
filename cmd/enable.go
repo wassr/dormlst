@@ -28,8 +28,9 @@ import (
 )
 
 var enableCmd = &cobra.Command{
-	Use:   "enable [query]",
-	Short: "Set a resident's status to active",
+	Use:     "enable [query]",
+	Aliases: []string{"en"},
+	Short:   "Set a resident's status to active",
 	Long:  `Search for a resident by name, room number, or email and set their status to active. If multiple matches are found, you will be prompted to select one.`,
 	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {

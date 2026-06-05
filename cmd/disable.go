@@ -28,8 +28,9 @@ import (
 )
 
 var disableCmd = &cobra.Command{
-	Use:   "disable [query]",
-	Short: "Set a resident's status to inactive without deleting",
+	Use:     "disable [query]",
+	Aliases: []string{"dis"},
+	Short:   "Set a resident's status to inactive without deleting",
 	Long:  `Search for a resident by name, room number, or email. If multiple matches are found, you will be prompted to select one to disable.`,
 	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
