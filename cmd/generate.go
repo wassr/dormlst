@@ -39,14 +39,14 @@ var generateCmd = &cobra.Command{
 		residents = model.FilterResidents(residents, "", model.FilterActive)
 
 		if len(residents) == 0 {
-			fmt.Println("No residents found in database. Output file will be empty.")
+			fmt.Printf("\033[2m\033[1m[INFO]\033[0m No residents found in database. Output file will be empty.\n")
 		}
 
 		if err := excel.Generate(residents, cfg.Output); err != nil {
 			return fmt.Errorf("failed to generate output file: %w", err)
 		}
 
-		fmt.Printf("Successfully generated %s from %s\n", cfg.Output.Path, cfg.Database.Path)
+		fmt.Printf("\033[32m\033[1m[OK]\033[0m Successfully generated %s from %s\n", cfg.Output.Path, cfg.Database.Path)
 		return nil
 	},
 }

@@ -48,7 +48,7 @@ var enableCmd = &cobra.Command{
 		if err != nil {
 			if errors.Is(err, ui.ErrNotFound) || errors.Is(err, ui.ErrAborted) {
 				if errors.Is(err, ui.ErrNotFound) {
-					fmt.Println(err.Error())
+					fmt.Printf("\033[31m\033[1m[ERROR]\033[0m %s\n", err.Error())
 				}
 				return nil
 			}
@@ -62,7 +62,7 @@ var enableCmd = &cobra.Command{
 			return err
 		}
 
-		fmt.Printf("Successfully enabled resident: %s %s\n", res.FirstName, res.LastName)
+		fmt.Printf("\033[32m\033[1m[OK]\033[0m Successfully enabled resident: %s %s\n", res.FirstName, res.LastName)
 		return nil
 	},
 }

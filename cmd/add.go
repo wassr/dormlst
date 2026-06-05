@@ -88,7 +88,7 @@ var addCmd = &cobra.Command{
 			return err
 		}
 
-		fmt.Printf("Successfully added resident: %s %s (Room %d)\n", res.FirstName, res.LastName, res.RoomNumber)
+		fmt.Printf("\033[32m\033[1m[OK]\033[0m Successfully added resident: %s %s (Room %d)\n", res.FirstName, res.LastName, res.RoomNumber)
 		return nil
 	},
 }

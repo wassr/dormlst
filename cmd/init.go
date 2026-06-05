@@ -38,7 +38,7 @@ var initCmd = &cobra.Command{
 			return fmt.Errorf("failed to save default config: %w", err)
 		}
 
-		fmt.Printf("Initialized default configuration in %s\n", cfgFile)
+		fmt.Printf("\033[32m\033[1m[OK]\033[0m Initialized default configuration in %s\n", cfgFile)
 		return nil
 	},
 }

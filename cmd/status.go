@@ -19,6 +19,7 @@ limitations under the License.
 import (
 	"fmt"
 	"os"
+	"strings"
 	"text/tabwriter"
 	"time"
 
@@ -30,19 +31,26 @@ var statusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Get stats and health check on the database",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println("\n  System Status")
-		fmt.Println("  -------------")
+		// ANSI color codes
+		bold := "\033[1m"
+		reset := "\033[0m"
+		green := "\033[32m"
+		red := "\033[31m"
+		faint := "\033[2m"
+
+		fmt.Printf("%sSystem Status%s\n", bold, reset)
+		fmt.Printf("%s\n", faint+strings.Repeat("\u2500", 45)+reset)
 
 		// 1. Config Check
-		fmt.Printf("  Config file:   %s [OK]\n", cfgFile)
+		fmt.Printf("Config file:   %s [%sOK%s]\n", cfgFile, green, reset)
 
 		// 2. Database Check
 		residents, err := csvdb.Load(cfg.Database.Path)
 		if err != nil {
-			fmt.Printf("  Database:      %s [ERROR: %v]\n", cfg.Database.Path, err)
+			fmt.Printf("Database:      %s [%sERROR%s: %v]\n", cfg.Database.Path, red, reset, err)
 			return nil
 		}
-		fmt.Printf("  Database:      %s [OK]\n", cfg.Database.Path)
+		fmt.Printf("Database:      %s [%sOK%s]\n", cfg.Database.Path, green, reset)
 		fmt.Println()
 
 		// 3. Stats Calculation
@@ -81,56 +89,37 @@ var statusCmd = &cobra.Command{
 		}
 
 		// 4. Output Stats
-		w := tabwriter.NewWriter(os.Stdout, 4, 0, 2, ' ', 0)
-		if _, err := fmt.Fprintf(w, "  RESIDENTS\t\n"); err != nil {
-			return err
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+		fmt.Fprintf(w, "%s[ Residents ]%s\t\n", bold, reset)
+		fmt.Fprintf(w, "Total\t%d\n", total)
+		fmt.Fprintf(w, "Active\t%s%d%s\n", green, active, reset)
+		fmt.Fprintf(w, "Inactive\t%s%d%s\n", red, inactive, reset)
+		fmt.Fprintf(w, "Avg. Age\t%.1f years\n", avgAge)
+		fmt.Fprintln(w, "\t")
+
+		fmt.Fprintf(w, "%s[ Infrastructure ]%s\t\n", bold, reset)
+		fmt.Fprintf(w, "Unique Rooms\t%d\n", len(uniqueRooms))
+		fmt.Fprintln(w, "\t")
+
+		fmt.Fprintf(w, "%s[ Health ]%s\t\n", bold, reset)
+		healthColor := green
+		if len(invalidMsgs) > 0 {
+			healthColor = red
 		}
-		if _, err := fmt.Fprintf(w, "  Total\t%d\n", total); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintf(w, "  Active\t%d\n", active); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintf(w, "  Inactive\t%d\n", inactive); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintf(w, "  Avg. Age\t%.1f\n", avgAge); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintf(w, "\t\n"); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintf(w, "  INFRASTRUCTURE\t\n"); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintf(w, "  Unique Rooms\t%d\n", len(uniqueRooms)); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintf(w, "\t\n"); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintf(w, "  HEALTH\t\n"); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintf(w, "  Valid Entries\t%d/%d\n", total-len(invalidMsgs), total); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintf(w, "  Recent Changes (7d)\t%d\n", recentMods); err != nil {
-			return err
-		}
+		fmt.Fprintf(w, "Valid Entries\t%s%d/%d%s\n", healthColor, total-len(invalidMsgs), total, reset)
+		fmt.Fprintf(w, "Recent Changes (7d)\t%d\n", recentMods)
 		if err := w.Flush(); err != nil {
 			return err
 		}
 
 		// 5. Report Invalid Entries
 		if len(invalidMsgs) > 0 {
-			fmt.Println("\n  Invalid Entries Found:")
+			fmt.Printf("\n%sInvalid Entries Found:%s\n", red+bold, reset)
 			for _, msg := range invalidMsgs {
-				fmt.Printf("  - %s\n", msg)
+				fmt.Printf("%s- %s%s\n", red, msg, reset)
 			}
 		}
 
-		fmt.Println()
 		return nil
 	},
 }

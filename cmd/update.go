@@ -28,18 +28,25 @@ import (
 )
 
 var (
-	updateRoom     int
-	updateEmail    string
-	updateSignedUp string
-	updateActive   bool
-	updateInactive bool
+	updateInteractive bool
+	updateFirstName   string
+	updateLastName    string
+	updateRoom        int
+	updateEmail       string
+	updatePhone       string
+	updateBirthday    string
+	updateSignedUp    string
+	updateSetEnable   bool
+	updateSetDisable  bool
+	updateActive      bool
+	updateInactive    bool
 )
 
 var updateCmd = &cobra.Command{
 	Use:     "update [query]",
 	Aliases: []string{"up"},
 	Short:   "Modify an existing resident's information",
-	Long:  `Search for a resident by name, room number, or email. If multiple matches are found, you will be prompted to select one.`,
+	Long:  `Search for a resident by name, room number, or email. If multiple matches are found, you will be prompted to select one. Use --interactive (-i) for a guided update, or use flags to update specific fields non-interactively.`,
 	Args:  cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		residents, err := csvdb.Load(cfg.Database.Path)
@@ -63,34 +70,71 @@ var updateCmd = &cobra.Command{
 		if err != nil {
 			if errors.Is(err, ui.ErrNotFound) || errors.Is(err, ui.ErrAborted) {
 				if errors.Is(err, ui.ErrNotFound) {
-					fmt.Println(err.Error())
+					fmt.Printf("\033[31m\033[1m[ERROR]\033[0m %s\n", err.Error())
 				}
 				return nil
 			}
 			return err
 		}
 
-		if updateRoom != 0 || updateEmail != "" || updateSignedUp != "" {
-			if updateRoom != 0 {
-				res.RoomNumber = updateRoom
-			}
-			if updateEmail != "" {
-				res.Email = updateEmail
-			}
-			if updateSignedUp != "" {
-				t, err := time.Parse("2006-01-02", updateSignedUp)
-				if err != nil {
-					return fmt.Errorf("invalid date format for signed-up: %w", err)
-				}
-				res.DateSignedUp = t
-			}
-		} else {
+		if updateInteractive {
 			res, err = ui.PromptResident(res, true)
 			if err != nil {
 				if errors.Is(err, ui.ErrAborted) {
 					return nil
 				}
 				return err
+			}
+		} else {
+			changed := false
+			if cmd.Flags().Changed("first-name") {
+				res.FirstName = updateFirstName
+				changed = true
+			}
+			if cmd.Flags().Changed("last-name") {
+				res.LastName = updateLastName
+				changed = true
+			}
+			if cmd.Flags().Changed("room") {
+				res.RoomNumber = updateRoom
+				changed = true
+			}
+			if cmd.Flags().Changed("email") {
+				res.Email = updateEmail
+				changed = true
+			}
+			if cmd.Flags().Changed("phone") {
+				res.PhoneNumber = updatePhone
+				changed = true
+			}
+			if cmd.Flags().Changed("birthday") {
+				t, err := time.Parse("2006-01-02", updateBirthday)
+				if err != nil {
+					return fmt.Errorf("invalid date format for birthday: %w", err)
+				}
+				res.Birthday = t
+				changed = true
+			}
+			if cmd.Flags().Changed("signed-up") {
+				t, err := time.Parse("2006-01-02", updateSignedUp)
+				if err != nil {
+					return fmt.Errorf("invalid date format for signed-up: %w", err)
+				}
+				res.DateSignedUp = t
+				changed = true
+			}
+			if updateSetEnable {
+				res.Active = true
+				changed = true
+			}
+			if updateSetDisable {
+				res.Active = false
+				changed = true
+			}
+
+			if !changed {
+				fmt.Printf("\033[31m\033[1m[ERROR]\033[0m No update flags provided. Use --interactive (-i) or specify fields to update.\n")
+				return nil
 			}
 		}
 
@@ -104,17 +148,25 @@ var updateCmd = &cobra.Command{
 			return err
 		}
 
-		fmt.Printf("Successfully updated resident %s %s\n", res.FirstName, res.LastName)
+		fmt.Printf("\033[32m\033[1m[OK]\033[0m Successfully updated resident: %s %s\n", res.FirstName, res.LastName)
 		return nil
 	},
 }
 
 func init() {
+	updateCmd.Flags().BoolVarP(&updateInteractive, "interactive", "i", false, "Start interactive update mode")
+	updateCmd.Flags().StringVar(&updateFirstName, "first-name", "", "New first name")
+	updateCmd.Flags().StringVar(&updateLastName, "last-name", "", "New last name")
 	updateCmd.Flags().IntVar(&updateRoom, "room", 0, "New room number")
 	updateCmd.Flags().StringVar(&updateEmail, "email", "", "New email address")
+	updateCmd.Flags().StringVar(&updatePhone, "phone", "", "New phone number")
+	updateCmd.Flags().StringVar(&updateBirthday, "birthday", "", "New birthday (YYYY-MM-DD)")
 	updateCmd.Flags().StringVar(&updateSignedUp, "signed-up", "", "New date signed up (YYYY-MM-DD)")
-	updateCmd.Flags().BoolVar(&updateActive, "active", false, "Filter for active residents only")
-	updateCmd.Flags().BoolVar(&updateInactive, "inactive", false, "Filter for inactive residents only")
+	updateCmd.Flags().BoolVar(&updateSetEnable, "enable", false, "Set resident to active")
+	updateCmd.Flags().BoolVar(&updateSetDisable, "disable", false, "Set resident to inactive")
+
+	updateCmd.Flags().BoolVar(&updateActive, "filter-active", false, "Only search for active residents")
+	updateCmd.Flags().BoolVar(&updateInactive, "filter-inactive", false, "Only search for inactive residents")
 
 	rootCmd.AddCommand(updateCmd)
 }

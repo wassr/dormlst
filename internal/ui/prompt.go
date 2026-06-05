@@ -37,8 +37,11 @@ var (
 // PromptResident guides the user through entering or updating resident data.
 func PromptResident(res model.Resident, isUpdate bool) (model.Resident, error) {
 	if isUpdate {
-		fmt.Printf("Updating Resident in Room %d: %s %s\n", res.RoomNumber, res.FirstName, res.LastName)
-		fmt.Println("Press Enter to keep current value.")
+		fmt.Printf("\033[1m[ Update Resident ]\033[0m\n")
+		fmt.Printf("%s %s (Room %d)\n", res.FirstName, res.LastName, res.RoomNumber)
+		fmt.Printf("\033[2mPress Enter to keep current value.\033[0m\n")
+	} else {
+		fmt.Printf("\033[1m[ Add New Resident ]\033[0m\n")
 	}
 
 	validateEmpty := func(input string) error {
@@ -239,9 +242,9 @@ func SelectResident(residents []model.Resident, label string) (model.Resident, i
 
 	templates := &promptui.SelectTemplates{
 		Label:    "{{ . }}",
-		Active:   "\U0001F449 {{ .FirstName | cyan }} {{ .LastName | cyan }} {{ \"(\" | cyan }}{{ .RoomNumber | cyan }}{{ \")\" | cyan }}{{ if .Active }} {{ \"\u2713\" | green }}{{ else }} {{ \"\u2717\" | red }} {{ end }}",
-		Inactive: "  {{ .FirstName }} {{ .LastName }} ({{ .RoomNumber }}){{ if .Active }} {{ \"\u2713\" | green }}{{ else }} {{ \"\u2717\" | red }}{{ end }}",
-		Selected: "\U0001F449 {{ .FirstName | green }} {{ .LastName | green }} {{ \"(\" | green }}{{ .RoomNumber | green }}{{ \")\" | green }}{{ if not .Active }}{{ end }}",
+		Active:   fmt.Sprintf("\U0001F449 {{ .FirstName | cyan }} {{ .LastName | cyan }} {{ \"(\" | cyan }}{{ .RoomNumber | cyan }}{{ \")\" | cyan }}{{ if .Active }} {{ \"\u2713\" | green }}{{ else }} {{ \"\u2717\" | red }} {{ \"[INACTIVE]\" | red }}{{ end }}"),
+		Inactive: "  {{ .FirstName }} {{ .LastName }} ({{ .RoomNumber }}){{ if .Active }} {{ \"\u2713\" | green }}{{ else }} {{ \"\u2717\" | red }} {{ \"[INACTIVE]\" | faint }}{{ end }}",
+		Selected: fmt.Sprintf("\U0001F449 {{ .FirstName | green }} {{ .LastName | green }} {{ \"(\" | green }}{{ .RoomNumber | green }}{{ \")\" | green }}{{ if not .Active }} {{ \"[INACTIVE]\" | red }}{{ end }}"),
 	}
 
 	searcher := func(input string, index int) bool {

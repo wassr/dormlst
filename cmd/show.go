@@ -36,10 +36,11 @@ var (
 )
 
 var showCmd = &cobra.Command{
-	Use:   "show [query]",
-	Short: "See all available data on one person",
-	Long:  `Search for a resident and display their full profile. If multiple matches are found, you will be prompted to select one.`,
-	Args:  cobra.MaximumNArgs(1),
+	Use:     "show [query]",
+	Aliases: []string{"info"},
+	Short:   "See all available data on one person",
+	Long:    `Search for a resident and display their full profile. If multiple matches are found, you will be prompted to select one.`,
+	Args:    cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		residents, err := csvdb.Load(cfg.Database.Path)
 		if err != nil {
@@ -62,78 +63,59 @@ var showCmd = &cobra.Command{
 		if err != nil {
 			if errors.Is(err, ui.ErrNotFound) || errors.Is(err, ui.ErrAborted) {
 				if errors.Is(err, ui.ErrNotFound) {
-					fmt.Println(err.Error())
+					fmt.Printf("\033[31m\033[1m[ERROR]\033[0m %s\n", err.Error())
 				}
 				return nil
 			}
 			return err
 		}
 
-		status := "Active"
+		// ANSI color codes
+		bold := "\033[1m"
+		reset := "\033[0m"
+		green := "\033[32m"
+		red := "\033[31m"
+		faint := "\033[2m"
+
+		statusStr := green + "Active \u2713" + reset
 		if !res.Active {
-			status = "Inactive"
+			statusStr = red + "Inactive \u2717" + reset
 		}
 
-		// Only show leading newlines if we had to pick from multiple matches
+		// Only show leading newline if we had to pick from multiple matches
 		if !auto {
 			fmt.Println()
 		}
 
-		fmt.Printf("  %s %s (Room %d)\n", res.FirstName, res.LastName, res.RoomNumber)
-		fmt.Printf("  %s\n\n", strings.Repeat("-", 40))
+		fmt.Printf("%s%s %s%s %s(%d)%s\n", bold, res.FirstName, res.LastName, reset, faint, res.RoomNumber, reset)
+		fmt.Printf("%s\n\n", faint+strings.Repeat("\u2500", 45)+reset)
 
-		w := tabwriter.NewWriter(os.Stdout, 4, 0, 2, ' ', 0)
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 
-		if _, err := fmt.Fprintf(w, "  STATUS\t%s\n", status); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintln(w, "\t"); err != nil {
-			return err
-		}
+		fmt.Fprintf(w, "Status\t%s\n", statusStr)
+		fmt.Fprintln(w, "\t")
 
-		if _, err := fmt.Fprintln(w, "  CONTACT\t"); err != nil {
-			return err
+		fmt.Fprintf(w, "%s[ Contact ]%s\t\n", bold, reset)
+		fmt.Fprintf(w, "Email\t%s\n", res.Email)
+		if res.PhoneNumber != "" {
+			fmt.Fprintf(w, "Phone\t%s\n", res.PhoneNumber)
+		} else {
+			fmt.Fprintf(w, "Phone\t%s--%s\n", faint, reset)
 		}
-		if _, err := fmt.Fprintf(w, "  Email\t%s\n", res.Email); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintf(w, "  Phone\t%s\n", res.PhoneNumber); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintln(w, "\t"); err != nil {
-			return err
-		}
+		fmt.Fprintln(w, "\t")
 
-		if _, err := fmt.Fprintln(w, "  DETAILS\t"); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintf(w, "  Room\t%d\n", res.RoomNumber); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintf(w, "  Birthday\t%s (Age: %d)\n", res.Birthday.Format("2006-01-02"), calculateAge(res.Birthday)); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintln(w, "\t"); err != nil {
-			return err
-		}
+		fmt.Fprintf(w, "%s[ Details ]%s\t\n", bold, reset)
+		fmt.Fprintf(w, "Birthday\t%s (%d years)\n", res.Birthday.Format("2006-01-02"), calculateAge(res.Birthday))
+		fmt.Fprintln(w, "\t")
 
-		if _, err := fmt.Fprintln(w, "  TIMESTAMPS\t"); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintf(w, "  Signed Up\t%s\n", res.DateSignedUp.Format("2006-01-02")); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintf(w, "  Added\t%s\n", res.DateAdded.Format("2006-01-02")); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintf(w, "  Modified\t%s\n", res.DateModified.Format("2006-01-02")); err != nil {
-			return err
-		}
+		fmt.Fprintf(w, "%s[ Timestamps ]%s\t\n", bold, reset)
+		fmt.Fprintf(w, "Signed Up\t%s\n", res.DateSignedUp.Format("2006-01-02"))
+		fmt.Fprintf(w, "Added\t%s\n", res.DateAdded.Format("2006-01-02"))
+		fmt.Fprintf(w, "Modified\t%s\n", res.DateModified.Format("2006-01-02"))
 
 		if err := w.Flush(); err != nil {
 			return err
 		}
-		fmt.Println()
 
 		return nil
 	},

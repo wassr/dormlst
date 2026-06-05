@@ -17,9 +17,10 @@ limitations under the License.
 */
 
 import (
+	"bytes"
 	"fmt"
-	"os"
 	"sort"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/spf13/cobra"
@@ -92,21 +93,46 @@ var searchCmd = &cobra.Command{
 			}
 		})
 
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-		if _, err := fmt.Fprintln(w, "ROOM\tNAME\tEMAIL\tPHONE\tACTIVE"); err != nil {
-			return err
-		}
+		bold := "\033[1m"
+		reset := "\033[0m"
+		green := "\033[32m"
+		red := "\033[31m"
+
+		var buf bytes.Buffer
+		w := tabwriter.NewWriter(&buf, 0, 0, 2, ' ', 0)
+		fmt.Fprintln(w, "ROOM\tNAME\tEMAIL\tPHONE\tACTIVE")
+
 		for _, res := range matched {
-			activeStr := "yes"
+			activeStr := "\u2713"
 			if !res.Active {
-				activeStr = "no"
+				activeStr = "\u2717"
 			}
-			if _, err := fmt.Fprintf(w, "%d\t%s %s\t%s\t%s\t%s\n",
-				res.RoomNumber, res.FirstName, res.LastName, res.Email, res.PhoneNumber, activeStr); err != nil {
-				return err
+			fmt.Fprintf(w, "%d\t%s %s\t%s\t%s\t%s\n",
+				res.RoomNumber, res.FirstName, res.LastName, res.Email, res.PhoneNumber, activeStr)
+		}
+		w.Flush()
+
+		// Apply colors line by line
+		lines := strings.Split(strings.TrimSpace(buf.String()), "\n")
+		for i, line := range lines {
+			if i == 0 {
+				// Header
+				fmt.Printf("%s%s%s\n", bold, line, reset)
+				continue
+			}
+
+			// Data rows
+			if strings.HasSuffix(line, "\u2713") {
+				// Active
+				fmt.Printf("%s%s%s\n", strings.TrimSuffix(line, "\u2713"), green, "\u2713"+reset)
+			} else if strings.HasSuffix(line, "\u2717") {
+				// Inactive
+				fmt.Printf("%s%s%s\n", strings.TrimSuffix(line, "\u2717"), red, "\u2717"+reset)
+			} else {
+				fmt.Println(line)
 			}
 		}
-		return w.Flush()
+		return nil
 	},
 }
 
