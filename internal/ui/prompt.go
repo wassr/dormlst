@@ -269,10 +269,10 @@ func SelectResident(residents []model.Resident, label string) (model.Resident, i
 	return residents[i], i, false, nil
 }
 
-// SelectFromMatches filters residents by query and prompts for selection if multiple matches exist.
+// SelectFromMatches filters residents by query and active filter, then prompts for selection if multiple matches exist.
 // Returns the resident, the index in the original database, and a boolean indicating if it was autoselected (single match).
-func SelectFromMatches(residents []model.Resident, query string, label string) (model.Resident, int, bool, error) {
-	matched := model.FilterResidents(residents, query)
+func SelectFromMatches(residents []model.Resident, query string, activeFilter model.ActiveFilter, label string) (model.Resident, int, bool, error) {
+	matched := model.FilterResidents(residents, query, activeFilter)
 	if len(matched) == 0 {
 		return model.Resident{}, -1, false, fmt.Errorf("%w matching: %s", ErrNotFound, query)
 	}

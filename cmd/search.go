@@ -28,7 +28,9 @@ import (
 )
 
 var (
-	searchSort string
+	searchSort     string
+	searchActive   bool
+	searchInactive bool
 )
 
 var searchCmd = &cobra.Command{
@@ -47,7 +49,14 @@ var searchCmd = &cobra.Command{
 			query = args[0]
 		}
 
-		matched := model.FilterResidents(residents, query)
+		filter := model.FilterAll
+		if searchActive {
+			filter = model.FilterActive
+		} else if searchInactive {
+			filter = model.FilterInactive
+		}
+
+		matched := model.FilterResidents(residents, query, filter)
 
 		if len(matched) == 0 {
 			if query != "" {
@@ -102,5 +111,7 @@ var searchCmd = &cobra.Command{
 
 func init() {
 	searchCmd.Flags().StringVarP(&searchSort, "sort", "s", "room", "Sort by: name, room, added, signup, modified")
+	searchCmd.Flags().BoolVar(&searchActive, "active", false, "Filter for active residents only")
+	searchCmd.Flags().BoolVar(&searchInactive, "inactive", false, "Filter for inactive residents only")
 	rootCmd.AddCommand(searchCmd)
 }

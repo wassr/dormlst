@@ -22,7 +22,13 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/wassr/dormlst/internal/csvdb"
+	"github.com/wassr/dormlst/internal/model"
 	"github.com/wassr/dormlst/internal/ui"
+)
+
+var (
+	removeActive   bool
+	removeInactive bool
 )
 
 var removeCmd = &cobra.Command{
@@ -41,7 +47,14 @@ var removeCmd = &cobra.Command{
 			query = args[0]
 		}
 
-		res, index, auto, err := ui.SelectFromMatches(residents, query, "Select Resident to Remove")
+		filter := model.FilterAll
+		if removeActive {
+			filter = model.FilterActive
+		} else if removeInactive {
+			filter = model.FilterInactive
+		}
+
+		res, index, auto, err := ui.SelectFromMatches(residents, query, filter, "Select Resident to Remove")
 		if err != nil {
 			if errors.Is(err, ui.ErrNotFound) || errors.Is(err, ui.ErrAborted) {
 				if errors.Is(err, ui.ErrNotFound) {
@@ -76,5 +89,7 @@ var removeCmd = &cobra.Command{
 }
 
 func init() {
+	removeCmd.Flags().BoolVar(&removeActive, "active", false, "Filter for active residents only")
+	removeCmd.Flags().BoolVar(&removeInactive, "inactive", false, "Filter for inactive residents only")
 	rootCmd.AddCommand(removeCmd)
 }

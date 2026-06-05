@@ -22,6 +22,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/wassr/dormlst/internal/csvdb"
 	"github.com/wassr/dormlst/internal/excel"
+	"github.com/wassr/dormlst/internal/model"
 )
 
 var generateCmd = &cobra.Command{
@@ -33,6 +34,8 @@ var generateCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("failed to load database: %w", err)
 		}
+
+		residents = model.FilterResidents(residents, "", model.FilterActive)
 
 		if len(residents) == 0 {
 			fmt.Println("No residents found in database. Output file will be empty.")

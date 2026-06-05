@@ -23,6 +23,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/wassr/dormlst/internal/csvdb"
+	"github.com/wassr/dormlst/internal/model"
 	"github.com/wassr/dormlst/internal/ui"
 )
 
@@ -42,7 +43,7 @@ var enableCmd = &cobra.Command{
 			query = args[0]
 		}
 
-		res, index, _, err := ui.SelectFromMatches(residents, query, "Select Resident to Enable")
+		res, index, _, err := ui.SelectFromMatches(residents, query, model.FilterInactive, "Select Resident to Enable")
 		if err != nil {
 			if errors.Is(err, ui.ErrNotFound) || errors.Is(err, ui.ErrAborted) {
 				if errors.Is(err, ui.ErrNotFound) {

@@ -249,26 +249,30 @@ func TestResident_Validate(t *testing.T) {
 
 func TestFilterResidents(t *testing.T) {
 	residents := []Resident{
-		{FirstName: "Alice", LastName: "Alpha", RoomNumber: 101, Email: "alice@example.com"},
-		{FirstName: "Bob", LastName: "Beta", RoomNumber: 202, Email: "bob@example.com"},
+		{FirstName: "Alice", LastName: "Alpha", RoomNumber: 101, Email: "alice@example.com", Active: true},
+		{FirstName: "Bob", LastName: "Beta", RoomNumber: 202, Email: "bob@example.com", Active: false},
 	}
 
 	tests := []struct {
 		name     string
 		query    string
+		filter   ActiveFilter
 		expected int
 	}{
-		{"Empty query", "", 2},
-		{"By first name", "alice", 1},
-		{"By last name", "beta", 1},
-		{"By room", "202", 1},
-		{"By email", "example.com", 2},
-		{"No match", "gamma", 0},
+		{"Empty query, all", "", FilterAll, 2},
+		{"Empty query, active", "", FilterActive, 1},
+		{"Empty query, inactive", "", FilterInactive, 1},
+		{"By first name, all", "alice", FilterAll, 1},
+		{"By first name, inactive", "alice", FilterInactive, 0},
+		{"By room, active", "202", FilterActive, 0},
+		{"By room, inactive", "202", FilterInactive, 1},
+		{"By email, all", "example.com", FilterAll, 2},
+		{"No match", "gamma", FilterAll, 0},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := FilterResidents(residents, tt.query)
+			got := FilterResidents(residents, tt.query, tt.filter)
 			if len(got) != tt.expected {
 				t.Errorf("FilterResidents() returned %d results, expected %d", len(got), tt.expected)
 			}

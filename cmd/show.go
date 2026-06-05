@@ -26,7 +26,13 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/wassr/dormlst/internal/csvdb"
+	"github.com/wassr/dormlst/internal/model"
 	"github.com/wassr/dormlst/internal/ui"
+)
+
+var (
+	showActive   bool
+	showInactive bool
 )
 
 var showCmd = &cobra.Command{
@@ -45,7 +51,14 @@ var showCmd = &cobra.Command{
 			query = args[0]
 		}
 
-		res, _, auto, err := ui.SelectFromMatches(residents, query, "Select Resident to Show")
+		filter := model.FilterAll
+		if showActive {
+			filter = model.FilterActive
+		} else if showInactive {
+			filter = model.FilterInactive
+		}
+
+		res, _, auto, err := ui.SelectFromMatches(residents, query, filter, "Select Resident to Show")
 		if err != nil {
 			if errors.Is(err, ui.ErrNotFound) || errors.Is(err, ui.ErrAborted) {
 				if errors.Is(err, ui.ErrNotFound) {
@@ -136,5 +149,7 @@ func calculateAge(birthdate time.Time) int {
 }
 
 func init() {
+	showCmd.Flags().BoolVar(&showActive, "active", false, "Filter for active residents only")
+	showCmd.Flags().BoolVar(&showInactive, "inactive", false, "Filter for inactive residents only")
 	rootCmd.AddCommand(showCmd)
 }

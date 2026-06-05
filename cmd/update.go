@@ -23,6 +23,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/wassr/dormlst/internal/csvdb"
+	"github.com/wassr/dormlst/internal/model"
 	"github.com/wassr/dormlst/internal/ui"
 )
 
@@ -30,6 +31,8 @@ var (
 	updateRoom     int
 	updateEmail    string
 	updateSignedUp string
+	updateActive   bool
+	updateInactive bool
 )
 
 var updateCmd = &cobra.Command{
@@ -48,7 +51,14 @@ var updateCmd = &cobra.Command{
 			query = args[0]
 		}
 
-		res, index, _, err := ui.SelectFromMatches(residents, query, "Select Resident to Update")
+		filter := model.FilterAll
+		if updateActive {
+			filter = model.FilterActive
+		} else if updateInactive {
+			filter = model.FilterInactive
+		}
+
+		res, index, _, err := ui.SelectFromMatches(residents, query, filter, "Select Resident to Update")
 		if err != nil {
 			if errors.Is(err, ui.ErrNotFound) || errors.Is(err, ui.ErrAborted) {
 				if errors.Is(err, ui.ErrNotFound) {
@@ -102,6 +112,8 @@ func init() {
 	updateCmd.Flags().IntVar(&updateRoom, "room", 0, "New room number")
 	updateCmd.Flags().StringVar(&updateEmail, "email", "", "New email address")
 	updateCmd.Flags().StringVar(&updateSignedUp, "signed-up", "", "New date signed up (YYYY-MM-DD)")
+	updateCmd.Flags().BoolVar(&updateActive, "active", false, "Filter for active residents only")
+	updateCmd.Flags().BoolVar(&updateInactive, "inactive", false, "Filter for inactive residents only")
 
 	rootCmd.AddCommand(updateCmd)
 }

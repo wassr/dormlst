@@ -47,14 +47,37 @@ type Resident struct {
 	Active       bool      `csv:"active"`
 }
 
-// FilterResidents returns a slice of residents that match the query in name, room, or email.
-func FilterResidents(residents []Resident, query string) []Resident {
-	if query == "" {
-		return residents
-	}
+// ActiveFilter defines how to filter residents by their active status.
+type ActiveFilter int
+
+const (
+	// FilterAll returns both active and inactive residents.
+	FilterAll ActiveFilter = iota
+	// FilterActive returns only active residents.
+	FilterActive
+	// FilterInactive returns only inactive residents.
+	FilterInactive
+)
+
+// FilterResidents returns a slice of residents that match the query and active filter.
+func FilterResidents(residents []Resident, query string, activeFilter ActiveFilter) []Resident {
 	query = strings.ToLower(query)
 	var matched []Resident
 	for _, r := range residents {
+		// Apply active filter
+		if activeFilter == FilterActive && !r.Active {
+			continue
+		}
+		if activeFilter == FilterInactive && r.Active {
+			continue
+		}
+
+		// Apply search query
+		if query == "" {
+			matched = append(matched, r)
+			continue
+		}
+
 		name := strings.ToLower(r.FirstName + " " + r.LastName)
 		room := strconv.Itoa(r.RoomNumber)
 		email := strings.ToLower(r.Email)
