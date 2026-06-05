@@ -61,7 +61,11 @@ Excel is notoriously bad for version control, often corrupts formatting (like ph
    ```bash
    dormlst gen
    ```
-6. **Check Health**: Audit the database for any validation errors.
+6. **Vacuum**: Permanently remove all disabled entries.
+   ```bash
+   dormlst vac --yes
+   ```
+7. **Check Health**: Audit the database for any validation errors.
    ```bash
    dormlst status
    ```
@@ -75,12 +79,14 @@ Excel is notoriously bad for version control, often corrupts formatting (like ph
 | `remove`   | `rm`   | Delete a resident from the CSV                   |
 | `enable`   | `en`   | Set a resident's status to active                |
 | `disable`  | `dis`  | Set a resident's status to inactive              |
+| `vacuum`   | `vac`  | Permanently remove all disabled entries          |
 | `search`   | `se`   | Find residents based on specific criteria        |
-| `show`     | `info` | See all available data on one person             |
+| `show`     | -      | See all available data on one person             |
 | `generate` | `gen`  | Generate the .xlsx file required for uploads     |
 | `upload`   | `push` | Upload the resident list (Stubbed)               |
 | `status`   | -      | Get stats and health check on the database       |
 | `init`     | -      | Initialize a default configuration file          |
+
 
 ## Configuration (`dormlst.yaml`)
 

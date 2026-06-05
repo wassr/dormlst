@@ -56,16 +56,17 @@ func TestE2ECLI(t *testing.T) {
 		return out.String(), stderr.String(), err
 	}
 
-	// Step 0: Version and License
+	// Step 0: Check version
 	t.Run("version", func(t *testing.T) {
 		out, _, err := runCmd("--version")
 		if err != nil {
 			t.Fatalf("version failed: %v", err)
 		}
-		if !strings.Contains(out, "1.0.0") {
+		if !strings.Contains(out, "1.1.0") {
 			t.Errorf("Version output missing expected version: %s", out)
 		}
 	})
+
 
 	t.Run("license", func(t *testing.T) {
 		out, _, err := runCmd("license")
@@ -181,6 +182,23 @@ func TestE2ECLI(t *testing.T) {
 		}
 		if _, err := os.Stat(xlsxPath); os.IsNotExist(err) {
 			t.Fatal("Excel file was not created")
+		}
+	})
+
+	// Step 9: Vacuum (Purge disabled entries)
+	t.Run("vacuum", func(t *testing.T) {
+		out, _, err := runCmd("vacuum", "--yes")
+		if err != nil {
+			t.Fatalf("vacuum failed: %v", err)
+		}
+		if !strings.Contains(out, "Successfully removed 1") {
+			t.Errorf("Unexpected vacuum output: %s", out)
+		}
+
+		// Verify deletion
+		out, _, _ = runCmd("search", "john")
+		if !strings.Contains(out, "No residents found") {
+			t.Errorf("Vacuum did not remove the inactive resident: %s", out)
 		}
 	})
 }

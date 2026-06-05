@@ -32,7 +32,7 @@ var (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "dormlst",
-	Version: "1.0.0",
+	Version: "1.1.0",
 	Short:   "Manage resident lists in Git-friendly CSV and generate .xlsx for uploads",
 	Long: `dormlst is a CLI tool designed to bypass the sync and formatting issues of Excel. 
 It maintains your resident database in a simple, sorted CSV format for version control, 
