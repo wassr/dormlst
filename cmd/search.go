@@ -100,17 +100,23 @@ var searchCmd = &cobra.Command{
 
 		var buf bytes.Buffer
 		w := tabwriter.NewWriter(&buf, 0, 0, 2, ' ', 0)
-		fmt.Fprintln(w, "ROOM\tNAME\tEMAIL\tPHONE\tACTIVE")
+		if _, err := fmt.Fprintln(w, "ROOM\tNAME\tEMAIL\tPHONE\tACTIVE"); err != nil {
+			return err
+		}
 
 		for _, res := range matched {
 			activeStr := "\u2713"
 			if !res.Active {
 				activeStr = "\u2717"
 			}
-			fmt.Fprintf(w, "%d\t%s %s\t%s\t%s\t%s\n",
-				res.RoomNumber, res.FirstName, res.LastName, res.Email, res.PhoneNumber, activeStr)
+			if _, err := fmt.Fprintf(w, "%d\t%s %s\t%s\t%s\t%s\n",
+				res.RoomNumber, res.FirstName, res.LastName, res.Email, res.PhoneNumber, activeStr); err != nil {
+				return err
+			}
 		}
-		w.Flush()
+		if err := w.Flush(); err != nil {
+			return err
+		}
 
 		// Apply colors line by line
 		lines := strings.Split(strings.TrimSpace(buf.String()), "\n")

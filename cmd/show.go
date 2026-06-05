@@ -92,26 +92,54 @@ var showCmd = &cobra.Command{
 
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 
-		fmt.Fprintf(w, "Status\t%s\n", statusStr)
-		fmt.Fprintln(w, "\t")
-
-		fmt.Fprintf(w, "%s[ Contact ]%s\t\n", bold, reset)
-		fmt.Fprintf(w, "Email\t%s\n", res.Email)
-		if res.PhoneNumber != "" {
-			fmt.Fprintf(w, "Phone\t%s\n", res.PhoneNumber)
-		} else {
-			fmt.Fprintf(w, "Phone\t%s--%s\n", faint, reset)
+		if _, err := fmt.Fprintf(w, "Status\t%s\n", statusStr); err != nil {
+			return err
 		}
-		fmt.Fprintln(w, "\t")
+		if _, err := fmt.Fprintln(w, "\t"); err != nil {
+			return err
+		}
 
-		fmt.Fprintf(w, "%s[ Details ]%s\t\n", bold, reset)
-		fmt.Fprintf(w, "Birthday\t%s (%d years)\n", res.Birthday.Format("2006-01-02"), calculateAge(res.Birthday))
-		fmt.Fprintln(w, "\t")
+		if _, err := fmt.Fprintf(w, "%s[ Contact ]%s\t\n", bold, reset); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "Email\t%s\n", res.Email); err != nil {
+			return err
+		}
+		if res.PhoneNumber != "" {
+			if _, err := fmt.Fprintf(w, "Phone\t%s\n", res.PhoneNumber); err != nil {
+				return err
+			}
+		} else {
+			if _, err := fmt.Fprintf(w, "Phone\t%s--%s\n", faint, reset); err != nil {
+				return err
+			}
+		}
+		if _, err := fmt.Fprintln(w, "\t"); err != nil {
+			return err
+		}
 
-		fmt.Fprintf(w, "%s[ Timestamps ]%s\t\n", bold, reset)
-		fmt.Fprintf(w, "Signed Up\t%s\n", res.DateSignedUp.Format("2006-01-02"))
-		fmt.Fprintf(w, "Added\t%s\n", res.DateAdded.Format("2006-01-02"))
-		fmt.Fprintf(w, "Modified\t%s\n", res.DateModified.Format("2006-01-02"))
+		if _, err := fmt.Fprintf(w, "%s[ Details ]%s\t\n", bold, reset); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "Birthday\t%s (%d years)\n", res.Birthday.Format("2006-01-02"), calculateAge(res.Birthday)); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintln(w, "\t"); err != nil {
+			return err
+		}
+
+		if _, err := fmt.Fprintf(w, "%s[ Timestamps ]%s\t\n", bold, reset); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "Signed Up\t%s\n", res.DateSignedUp.Format("2006-01-02")); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "Added\t%s\n", res.DateAdded.Format("2006-01-02")); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "Modified\t%s\n", res.DateModified.Format("2006-01-02")); err != nil {
+			return err
+		}
 
 		if err := w.Flush(); err != nil {
 			return err

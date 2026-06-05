@@ -242,9 +242,9 @@ func SelectResident(residents []model.Resident, label string) (model.Resident, i
 
 	templates := &promptui.SelectTemplates{
 		Label:    "{{ . }}",
-		Active:   fmt.Sprintf("\U0001F449 {{ .FirstName | cyan }} {{ .LastName | cyan }} {{ \"(\" | cyan }}{{ .RoomNumber | cyan }}{{ \")\" | cyan }}{{ if .Active }} {{ \"\u2713\" | green }}{{ else }} {{ \"\u2717\" | red }} {{ \"[INACTIVE]\" | red }}{{ end }}"),
+		Active:   "\U0001F449 {{ .FirstName | cyan }} {{ .LastName | cyan }} {{ \"(\" | cyan }}{{ .RoomNumber | cyan }}{{ \")\" | cyan }}{{ if .Active }} {{ \"\u2713\" | green }}{{ else }} {{ \"\u2717\" | red }} {{ \"[INACTIVE]\" | red }}{{ end }}",
 		Inactive: "  {{ .FirstName }} {{ .LastName }} ({{ .RoomNumber }}){{ if .Active }} {{ \"\u2713\" | green }}{{ else }} {{ \"\u2717\" | red }} {{ \"[INACTIVE]\" | faint }}{{ end }}",
-		Selected: fmt.Sprintf("\U0001F449 {{ .FirstName | green }} {{ .LastName | green }} {{ \"(\" | green }}{{ .RoomNumber | green }}{{ \")\" | green }}{{ if not .Active }} {{ \"[INACTIVE]\" | red }}{{ end }}"),
+		Selected: "\U0001F449 {{ .FirstName | green }} {{ .LastName | green }} {{ \"(\" | green }}{{ .RoomNumber | green }}{{ \")\" | green }}{{ if not .Active }} {{ \"[INACTIVE]\" | red }}{{ end }}",
 	}
 
 	searcher := func(input string, index int) bool {

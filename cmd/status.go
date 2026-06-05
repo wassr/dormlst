@@ -90,24 +90,48 @@ var statusCmd = &cobra.Command{
 
 		// 4. Output Stats
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-		fmt.Fprintf(w, "%s[ Residents ]%s\t\n", bold, reset)
-		fmt.Fprintf(w, "Total\t%d\n", total)
-		fmt.Fprintf(w, "Active\t%s%d%s\n", green, active, reset)
-		fmt.Fprintf(w, "Inactive\t%s%d%s\n", red, inactive, reset)
-		fmt.Fprintf(w, "Avg. Age\t%.1f years\n", avgAge)
-		fmt.Fprintln(w, "\t")
+		if _, err := fmt.Fprintf(w, "%s[ Residents ]%s\t\n", bold, reset); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "Total\t%d\n", total); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "Active\t%s%d%s\n", green, active, reset); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "Inactive\t%s%d%s\n", red, inactive, reset); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "Avg. Age\t%.1f years\n", avgAge); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintln(w, "\t"); err != nil {
+			return err
+		}
 
-		fmt.Fprintf(w, "%s[ Infrastructure ]%s\t\n", bold, reset)
-		fmt.Fprintf(w, "Unique Rooms\t%d\n", len(uniqueRooms))
-		fmt.Fprintln(w, "\t")
+		if _, err := fmt.Fprintf(w, "%s[ Infrastructure ]%s\t\n", bold, reset); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "Unique Rooms\t%d\n", len(uniqueRooms)); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintln(w, "\t"); err != nil {
+			return err
+		}
 
-		fmt.Fprintf(w, "%s[ Health ]%s\t\n", bold, reset)
+		if _, err := fmt.Fprintf(w, "%s[ Health ]%s\t\n", bold, reset); err != nil {
+			return err
+		}
 		healthColor := green
 		if len(invalidMsgs) > 0 {
 			healthColor = red
 		}
-		fmt.Fprintf(w, "Valid Entries\t%s%d/%d%s\n", healthColor, total-len(invalidMsgs), total, reset)
-		fmt.Fprintf(w, "Recent Changes (7d)\t%d\n", recentMods)
+		if _, err := fmt.Fprintf(w, "Valid Entries\t%s%d/%d%s\n", healthColor, total-len(invalidMsgs), total, reset); err != nil {
+			return err
+		}
+		if _, err := fmt.Fprintf(w, "Recent Changes (7d)\t%d\n", recentMods); err != nil {
+			return err
+		}
 		if err := w.Flush(); err != nil {
 			return err
 		}
