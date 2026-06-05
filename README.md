@@ -47,25 +47,30 @@ Excel is notoriously bad for version control, often corrupts formatting (like ph
    ```bash
    dormlst add -i
    ```
-3. **Search & Show**: Find residents and view detailed profiles.
+3. **Update**: Use flags of interactive mode (`-i`)
+   ```bash
+   dormlst update "Noel" --room 555
+   dormlst update -i "Noel"
+   ```
+4. **Search & Show**: Find residents and view detailed profiles.
    ```bash
    dormlst se "Noel"
    dormlst show 666
    ```
-4. **Enable/Disable**: Toggle resident status.
+5. **Enable/Disable**: Toggle resident status.
    ```bash
    dormlst dis "Noel" # Set to inactive
    dormlst en "Noel"  # Set to active
    ```
-5. **Generate Upload File**: Produce the .xlsx for external use.
+6. **Generate Upload File**: Produce the .xlsx for external use.
    ```bash
    dormlst gen
    ```
-6. **Vacuum**: Permanently remove all disabled entries.
+7. **Vacuum**: Permanently remove all disabled entries.
    ```bash
    dormlst vac --yes
    ```
-7. **Check Health**: Audit the database for any validation errors.
+8. **Check Health**: Audit the database for any validation errors.
    ```bash
    dormlst status
    ```

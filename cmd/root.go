@@ -36,8 +36,7 @@ var rootCmd = &cobra.Command{
 	Short:   "Manage resident lists in Git-friendly CSV and generate .xlsx for uploads",
 	Long: `dormlst is a CLI tool designed to bypass the sync and formatting issues of Excel. 
 It maintains your resident database in a simple, sorted CSV format for version control, 
-while providing tools to generate the .xlsx files required by external services 
-(like workitout.at).`,
+while providing tools to generate the .xlsx files required by external services.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		return initConfig()
 	},
